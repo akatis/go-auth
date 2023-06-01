@@ -7,7 +7,7 @@ import (
 )
 
 func Test(ctx *fiber.Ctx) error {
-	a := authTest.GetConf()
+	a := authTest.GetAuth()
 
 	data, _ := json.Marshal("It works too‼")
 	ctx.Response().SetStatusCode(200)

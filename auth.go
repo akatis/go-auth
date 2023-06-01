@@ -23,7 +23,7 @@ type Auth struct {
 	EndPointPermissions map[string]int
 }
 
-func NewConfig(config *Config) *Auth {
+func New(config *Config) *Auth {
 	config.init()
 
 	var auth Auth

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var a = auth.NewConfig(&auth.Config{
+var a = auth.New(&auth.Config{
 	Redis: struct {
 		RedisAddr    string
 		RedisPass    string
@@ -18,6 +18,6 @@ var a = auth.NewConfig(&auth.Config{
 	JwtSecretKey: "secret_key",
 })
 
-func GetConf() *auth.Auth {
+func GetAuth() *auth.Auth {
 	return a
 }

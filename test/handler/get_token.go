@@ -7,7 +7,8 @@ import (
 )
 
 func GetToken(ctx *fiber.Ctx) error {
-	a := authTest.GetConf()
+	a := authTest.GetAuth()
+
 	token := a.CreateAccessToken("uuid3", []int{0})
 
 	_ = a.AddToRedis("uuid3", "user agent")

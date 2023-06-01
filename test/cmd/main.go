@@ -12,7 +12,7 @@ func main() {
 	app := fiber.New()
 	api := app.Group("/api")
 
-	a := authTest.GetConf()
+	a := authTest.GetAuth()
 
 	api.Use(a.Middleware)
 
