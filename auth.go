@@ -50,6 +50,10 @@ func New(config *Config) *Auth {
 
 // Create AccessToken
 func (a *Auth) CreateAccessToken(uuid string, roles []int) string {
+	var header HeaderConfig
+	header.Alg = "HS256"
+	header.Typ = "JWT"
+
 	var payload PayloadConfig
 	payload.Uuid = uuid
 	payload.Roles = roles
@@ -57,7 +61,7 @@ func (a *Auth) CreateAccessToken(uuid string, roles []int) string {
 	payload.IssuedAt = time.Now().Unix()
 
 	// JSON
-	jsonHeader, _ := json.Marshal(a.Header)
+	jsonHeader, _ := json.Marshal(header)
 	jsonPayload, _ := json.Marshal(payload)
 
 	// BASE64
