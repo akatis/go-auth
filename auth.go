@@ -24,7 +24,7 @@ type Auth struct {
 }
 
 func New(config *Config) *Auth {
-	config.init()
+	//config.init()
 
 	var auth Auth
 
