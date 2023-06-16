@@ -9,7 +9,6 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
-	"log"
 	"strings"
 	"time"
 )
@@ -19,7 +18,7 @@ type Auth struct {
 	Payload             string
 	JwtSecretKey        []byte
 	AccessToken         string
-	RedisClient         *redis.Client
+	RedisConn           *redis.Conn
 	EndPointPermissions map[string]int
 }
 
@@ -31,7 +30,7 @@ func New(config *Config) *Auth {
 	auth.JwtSecretKey = []byte(config.JwtSecretKey)
 
 	// Redis: connection
-	auth.RedisClient = redis.NewClient(&redis.Options{
+	auth.RedisConn = redis.NewClient(&redis.Options{
 		Addr:         config.Redis.RedisAddr,
 		Password:     config.Redis.RedisPass,
 		DB:           config.Redis.RedisDb,
@@ -39,7 +38,7 @@ func New(config *Config) *Auth {
 		MaxIdleConns: config.Redis.MaxIdleConns,
 		MinIdleConns: config.Redis.MinIdleConns,
 		DialTimeout:  config.Redis.DialTimeout,
-	})
+	}).Conn()
 
 	//auth.RedisConn = client.Conn()
 
@@ -96,9 +95,11 @@ func (a *Auth) TokenVerify(signature string) error {
 }
 
 // REDIS TRANSACTIONS
+// Add user session to Redis
 func (a *Auth) AddToRedis(uuid, userAgent string) error {
-	conn := a.RedisClient.Conn()
-	defer conn.Close()
+	//conn := a.RedisClient.Conn()
+	//defer conn.Close()
+	conn := a.RedisConn
 
 	split := strings.Split(a.AccessToken, ".")
 	payload := split[1]
@@ -107,24 +108,27 @@ func (a *Auth) AddToRedis(uuid, userAgent string) error {
 
 	_, err := conn.HSet(ctx, uuid, payload, userAgent).Result()
 	if err != nil {
-		log.Fatal(err.Error())
+		return errors.New(err.Error())
 	}
 	return err
 }
 
+// Checking user session from Redis
 func (a *Auth) CheckFromRedis(uuid string) error {
-	conn := a.RedisClient.Conn()
-	defer conn.Close()
+	//conn := a.RedisClient.Conn()
+	//defer conn.Close()
+	conn := a.RedisConn
 
 	ctx := context.Background()
 
 	_, err := conn.HGet(ctx, uuid, a.Payload).Result()
 	if err != nil {
-		log.Fatal(err.Error())
+		return errors.New(err.Error())
 	}
-
 	return err
 }
+
+// Token expired, delete session from Redis
 func (a *Auth) DeleteFromRedis(authPayload string) error {
 
 	jwtPayload, _ := base64.RawURLEncoding.DecodeString(authPayload)
@@ -132,20 +136,34 @@ func (a *Auth) DeleteFromRedis(authPayload string) error {
 	var payload PayloadConfig
 	err := json.Unmarshal(jwtPayload, &payload)
 	if err != nil {
-		log.Fatal(err.Error())
+		return errors.New(err.Error())
 	}
 
-	conn := a.RedisClient.Conn()
-	defer conn.Close()
+	//conn := a.RedisClient.Conn()
+	//defer conn.Close()
+	conn := a.RedisConn
 
 	err = conn.HDel(context.Background(), payload.Uuid, authPayload).Err()
 	if err != nil {
-		log.Fatal(err.Error())
+		return errors.New(err.Error())
 	}
 
 	return nil
 }
 
+// Delete all sessions of deregistered user from Redis
+func (a *Auth) DeleteKeyFromRedis(uuid string) error {
+	conn := a.RedisConn
+
+	err := conn.Del(context.Background(), uuid)
+	if err != nil {
+		return errors.New(err.String())
+	}
+
+	return nil
+}
+
+// AUTHORIZATION AND AUTHENTICATION MIDDLEWARE
 func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 
 	var response Response
