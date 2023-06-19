@@ -94,6 +94,34 @@ func (a *Auth) TokenVerify(signature string) error {
 	return nil
 }
 
+func (a *Auth) GetUUID(ctx *fiber.Ctx) (string, error) {
+	var uuid string
+
+	authHeader := string(ctx.Request().Header.Peek("Authorization"))
+	if authHeader == "" {
+		return "", errors.New("invalid token")
+	}
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return "", errors.New("malformed token")
+	}
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	authTokenParts := strings.Split(token, ".")
+	if len(authTokenParts) != 3 {
+		return "", errors.New("malformed token")
+	}
+
+	var payload PayloadConfig
+	payloadBase64, _ := base64.RawURLEncoding.DecodeString(authTokenParts[1])
+	err := json.Unmarshal(payloadBase64, &payload)
+	if err != nil {
+		return "", errors.New(err.Error())
+	}
+
+	uuid = payload.Uuid
+
+	return uuid, nil
+}
+
 // REDIS TRANSACTIONS
 // Add user session to Redis
 func (a *Auth) AddToRedis(uuid, userAgent string) error {
