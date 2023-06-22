@@ -2,6 +2,8 @@ package auth
 
 import "time"
 
+const Admin = 1
+
 type Config struct {
 	Header              HeaderConfig
 	Payload             PayloadConfig
