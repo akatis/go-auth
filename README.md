@@ -10,7 +10,7 @@ go get "github.com/akatis/go-auth"
 ```go
 import "github.com/akatis/go-auth"
 ```
-#### 2- Secondly create Auth veriable.
+#### 2- Secondly create Auth variable.
 Create an "auth" directory and define a global variable there to get the Auth struct with the New method.
 <br>Create GetAuth() method to use the auth variable in different directories.
 ```go 
