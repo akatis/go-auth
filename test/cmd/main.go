@@ -8,16 +8,16 @@ import (
 )
 
 func main() {
-	a := authTest.GetAuth()
 
 	app := fiber.New()
-	app.Get("/get", handler.GetToken)
-
 	api := app.Group("/api")
+
+	a := authTest.GetAuth()
+
 	api.Use(a.Middleware)
 
-	api.Get("/testo", handler.Test)
-	api.Get("/test/:id/user/:name", handler.Test)
+	app.Get("/get", handler.GetToken)
+	api.Get("/test", handler.Test)
 
 	err := app.Listen(":7777")
 	if err != nil {
