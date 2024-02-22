@@ -237,7 +237,13 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 	}
 
 	// CHECK USER PERMISSION
-	pathPermission := a.EndPointPermissions[ctx.Path()]
+	err = ctx.Next()
+	if err != nil {
+		return response.HttpResponse(ctx, 400)
+	}
+	path := ctx.Route().Path
+	pathPermission := a.EndPointPermissions[path]
+
 	hasPermission := PermissionsContains(payload.Roles, pathPermission)
 
 	if !hasPermission && pathPermission != 999 {
@@ -255,3 +261,37 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 
 	return nil
 }
+
+/*
+
+func (a *Auth) PermissionCheck(c *fiber.Ctx, roles []int) bool {
+	path := c.Path()
+
+	segments := strings.Split(path, "/")
+	_, err := strconv.Atoi(segments[len(segments)-1])
+	if err == nil {
+		segments[len(segments)-1] = "*"
+	}
+
+	pattern := strings.Join(segments, "/")
+
+	// Her bir endpoint için gereken yetkiyi belirleriz.
+	requiredPermission, ok := a.EndPointPermissions[pattern]
+	if !ok {
+		// Eğer endpoint yetkileri içinde path yoksa hata dönebiliriz.
+		return false
+	}
+
+	// Kullanıcının yetkilerini bir şekilde almalıyız.
+	// Bu genellikle header'dan gelen bir token ile yapılır.
+	userPermission := PermissionsContains(roles, requiredPermission)
+
+	// Eğer kullanıcının yetkisi gerekli yetkiden düşükse hata dönebiliriz.
+	if !userPermission && requiredPermission != 999 {
+		return false
+	}
+
+	// Her şey yolundaysa normal route handler'a devam ederiz.
+	return true
+}
+*/

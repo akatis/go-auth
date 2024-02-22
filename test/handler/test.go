@@ -9,9 +9,11 @@ import (
 func Test(ctx *fiber.Ctx) error {
 	a := authTest.GetAuth()
 
+	id := ctx.Params("id")
 	uuid, _ := a.GetUUID(ctx)
 
-	data, _ := json.Marshal(uuid)
+	m := uuid + id
+	data, _ := json.Marshal(m)
 	ctx.Response().SetStatusCode(200)
 	ctx.Response().Header.Add("Content-Type", "application/json")
 	ctx.Write(data)
