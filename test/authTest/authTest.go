@@ -15,7 +15,8 @@ var a = auth.New(&auth.Config{
 		MinIdleConns int
 		DialTimeout  time.Duration
 	}{RedisAddr: "localhost:6379", RedisPass: "password", RedisDb: 0, PoolSize: 1000, MaxIdleConns: 100, MinIdleConns: 10},
-	JwtSecretKey: "secret_key",
+	JwtSecretKey:        "secret_key",
+	EndpointPermissions: EndPointPermissions,
 })
 
 func GetAuth() *auth.Auth {

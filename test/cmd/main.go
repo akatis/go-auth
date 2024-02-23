@@ -10,14 +10,15 @@ import (
 func main() {
 
 	app := fiber.New()
-	api := app.Group("/api")
+	app.Get("/get", handler.GetToken)
 
 	a := authTest.GetAuth()
 
+	api := app.Group("/api")
 	api.Use(a.Middleware)
 
-	app.Get("/get", handler.GetToken)
-	api.Get("/test", handler.Test)
+	api.Get("/test/t", handler.Test)
+	api.Get("/test/:id", handler.Test)
 
 	err := app.Listen(":7777")
 	if err != nil {

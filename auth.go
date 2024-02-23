@@ -237,8 +237,14 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 	}
 
 	// CHECK USER PERMISSION
-	//yorum
-	pathPermission := a.EndPointPermissions[ctx.Path()]
+	err = ctx.Next()
+	if err != nil {
+		response.Message = "Error checking user permissions"
+		return response.HttpResponse(ctx, 500)
+	}
+	path := ctx.Route().Path
+
+	pathPermission := a.EndPointPermissions[path]
 	hasPermission := PermissionsContains(payload.Roles, pathPermission)
 
 	if !hasPermission && pathPermission != 999 {
