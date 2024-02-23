@@ -237,6 +237,7 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 	}
 
 	// CHECK USER PERMISSION
+	//yorum
 	pathPermission := a.EndPointPermissions[ctx.Path()]
 	hasPermission := PermissionsContains(payload.Roles, pathPermission)
 
