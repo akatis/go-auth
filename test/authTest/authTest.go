@@ -14,7 +14,7 @@ var a = auth.New(&auth.Config{
 		MaxIdleConns int
 		MinIdleConns int
 		DialTimeout  time.Duration
-	}{RedisAddr: "localhost:6379", RedisPass: "password", RedisDb: 0, PoolSize: 1000, MaxIdleConns: 100, MinIdleConns: 10},
+	}{RedisAddr: "3.71.180.188:6379", RedisPass: "!*iEcZa20?23*!", RedisDb: 0, PoolSize: 1000, MaxIdleConns: 100, MinIdleConns: 10},
 	JwtSecretKey:        "secret_key",
 	EndpointPermissions: EndPointPermissions,
 })

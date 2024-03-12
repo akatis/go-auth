@@ -235,6 +235,11 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 		response.Message = "6-Token expired"
 		return response.HttpResponse(ctx, 403)
 	}
+	err = a.CheckFromRedis(payload.Uuid)
+	if err != nil {
+		response.Message = "User session not found."
+		return response.HttpResponse(ctx, 403)
+	}
 
 	// CHECK USER PERMISSION
 	err = ctx.Next()
@@ -250,12 +255,6 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 	if !hasPermission && pathPermission != 999 {
 		response.Message = "You don't have permission to access this end-point"
 		return response.HttpResponse(ctx, 401)
-	}
-
-	err = a.CheckFromRedis(payload.Uuid)
-	if err != nil {
-		response.Message = "User session not found."
-		return response.HttpResponse(ctx, 403)
 	}
 
 	ctx.Next()
