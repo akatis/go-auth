@@ -242,7 +242,6 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 	}
 
 	// CHECK USER PERMISSION
-	err = ctx.Next()
 	if err != nil {
 		response.Message = "Error checking user permissions"
 		return response.HttpResponse(ctx, 500)
