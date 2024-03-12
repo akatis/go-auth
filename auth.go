@@ -242,13 +242,8 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 	}
 
 	// CHECK USER PERMISSION
-	if err != nil {
-		response.Message = "Error checking user permissions"
-		return response.HttpResponse(ctx, 500)
-	}
-	path := ctx.Route().Path
 
-	pathPermission := a.EndPointPermissions[path]
+	pathPermission := a.EndPointPermissions[ctx.Path()]
 	hasPermission := PermissionsContains(payload.Roles, pathPermission)
 
 	if !hasPermission && pathPermission != 999 {
