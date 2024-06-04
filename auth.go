@@ -183,9 +183,9 @@ func (a *Auth) DeleteFromRedis(authPayload string) error {
 func (a *Auth) DeleteKeyFromRedis(uuid string) error {
 	conn := a.RedisConn
 
-	err := conn.Del(context.Background(), uuid)
+	err := conn.Del(context.Background(), uuid).Err()
 	if err != nil {
-		return errors.New(err.String())
+		return errors.New(err.Error())
 	}
 
 	return nil
