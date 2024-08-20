@@ -1,4 +1,4 @@
-module github.com/akatis/go-auth
+module github.com/akatis/go-auth/v2
 
 go 1.20
 
