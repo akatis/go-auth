@@ -6,8 +6,10 @@ type HeaderConfig struct {
 }
 
 type PayloadConfig struct {
-	Uuid      string `json:"uuid,omitempty"`
+	Uuid      string `json:"uuid"`
 	Roles     []int  `json:"roles"`
+	ShopID    *int   `json:"shop_id,omitempty"`
+	CompanyID *int   `json:"company_id,omitempty"`
 	Audience  string `json:"aud,omitempty"`
 	ExpiresAt int64  `json:"exp,omitempty"`
 	Id        string `json:"jti,omitempty"`

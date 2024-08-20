@@ -48,16 +48,19 @@ func New(config *Config) *Auth {
 }
 
 // Create AccessToken
-func (a *Auth) CreateAccessToken(uuid string, roles []int) string {
+func (a *Auth) CreateAccessToken(uuid string, roles []int, shopId, companyId *int) string {
 	var header HeaderConfig
 	header.Alg = "HS256"
 	header.Typ = "JWT"
 
-	var payload PayloadConfig
-	payload.Uuid = uuid
-	payload.Roles = roles
-	payload.ExpiresAt = time.Now().Add(time.Minute * 30).Unix()
-	payload.IssuedAt = time.Now().Unix()
+	var payload = PayloadConfig{
+		Uuid:      uuid,
+		Roles:     roles,
+		ShopID:    shopId,
+		CompanyID: companyId,
+		ExpiresAt: time.Now().Add(time.Minute * 30).Unix(),
+		IssuedAt:  time.Now().Unix(),
+	}
 
 	// JSON
 	jsonHeader, _ := json.Marshal(header)
@@ -120,6 +123,71 @@ func (a *Auth) GetUUID(ctx *fiber.Ctx) (string, error) {
 	uuid = payload.Uuid
 
 	return uuid, nil
+}
+
+func (a *Auth) GetShopID(ctx *fiber.Ctx) (int, error) {
+	var shopID int
+
+	authHeader := string(ctx.Request().Header.Peek("Authorization"))
+	if authHeader == "" {
+		return 0, errors.New("invalid token")
+	}
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return 0, errors.New("malformed token")
+	}
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	authTokenParts := strings.Split(token, ".")
+	if len(authTokenParts) != 3 {
+		return 0, errors.New("malformed token")
+	}
+
+	var payload PayloadConfig
+	payloadBase64, _ := base64.RawURLEncoding.DecodeString(authTokenParts[1])
+	err := json.Unmarshal(payloadBase64, &payload)
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	if payload.ShopID == nil {
+		return 0, errors.New("shopID is nil")
+	}
+
+	shopID = *payload.ShopID
+
+	return shopID, nil
+
+}
+
+func (a *Auth) GetCompanyID(ctx *fiber.Ctx) (int, error) {
+	var companyID int
+
+	authHeader := string(ctx.Request().Header.Peek("Authorization"))
+	if authHeader == "" {
+		return 0, errors.New("invalid token")
+	}
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return 0, errors.New("malformed token")
+	}
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	authTokenParts := strings.Split(token, ".")
+	if len(authTokenParts) != 3 {
+		return 0, errors.New("malformed token")
+	}
+
+	var payload PayloadConfig
+	payloadBase64, _ := base64.RawURLEncoding.DecodeString(authTokenParts[1])
+	err := json.Unmarshal(payloadBase64, &payload)
+	if err != nil {
+		return 0, errors.New(err.Error())
+	}
+
+	if payload.CompanyID == nil {
+		return 0, errors.New("companyID is nil")
+	}
+
+	companyID = *payload.CompanyID
+
+	return companyID, nil
 }
 
 // REDIS TRANSACTIONS
