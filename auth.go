@@ -7,10 +7,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
 	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 )
 
 type Auth struct {
@@ -97,10 +98,9 @@ func (a *Auth) TokenVerify(signature string) error {
 	return nil
 }
 
-func (a *Auth) GetUUID(ctx *fiber.Ctx) (string, error) {
+func (a *Auth) GetUUID(authHeader string) (string, error) {
 	var uuid string
 
-	authHeader := string(ctx.Request().Header.Peek("Authorization"))
 	if authHeader == "" {
 		return "", errors.New("invalid token")
 	}
