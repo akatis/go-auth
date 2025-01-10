@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/akatis/go-auth/test/authTest"
+	"github.com/akatis/go-auth/v3/test/authTest"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -12,8 +12,9 @@ func Test(ctx *fiber.Ctx) error {
 	fmt.Println("api")
 	fmt.Println(ctx.Route().Path)
 
+	authHeader := ctx.Get("Authorization")
 	//uuid, _ := a.GetUUID(ctx)
-	shopId, err := a.GetShopID(ctx)
+	shopId, err := a.GetShopID(authHeader)
 
 	if err != nil {
 		data, _ := json.Marshal(err.Error())
