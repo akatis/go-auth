@@ -3,6 +3,7 @@ package auth
 import "time"
 
 const Admin = 1
+const AllUser = 999
 
 type Config struct {
 	Header              HeaderConfig
