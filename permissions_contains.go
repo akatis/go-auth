@@ -7,6 +7,9 @@ func PermissionsContains(s []int, p int) bool {
 			return true
 		}
 	}
+	if p == AllUser {
+		return true
+	}
 
 	return false
 }
