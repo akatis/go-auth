@@ -237,10 +237,10 @@ func matchRoute(routeDef, path string) bool {
 	for i, seg := range defParts {
 		// If segment is a parameter (e.g., :id, :xyz)
 		if strings.HasPrefix(seg, ":") {
-			// Ensure parameter segment is numeric
-			if !isNumeric(pathParts[i]) {
-				return false
-			}
+			// // Ensure parameter segment is numeric
+			// if !isNumeric(pathParts[i]) {
+			// 	return false
+			// }
 			continue
 		}
 		// If not a parameter, check for exact match
