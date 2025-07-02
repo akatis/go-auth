@@ -64,6 +64,37 @@ func (a *Auth) CreateAccessToken(uuid string, roles []int, shopId, companyId *in
 	return token
 }
 
+func (a *Auth) IsThatRole(authHeader string, role int) (bool, error) {
+
+	if authHeader == "" {
+		return false, errors.New("invalid token")
+	}
+
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return false, errors.New("malformed token")
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	authTokenParts := strings.Split(token, ".")
+	if len(authTokenParts) != 3 {
+		return false, errors.New("malformed token")
+	}
+
+	payloadBase64, _ := base64.RawURLEncoding.DecodeString(authTokenParts[1])
+	var payload PayloadConfig
+	if err := json.Unmarshal(payloadBase64, &payload); err != nil {
+		return false, errors.New(err.Error())
+	}
+
+	for _, v := range payload.Roles {
+		if v == role {
+			return true, nil
+		}
+	}
+
+	return false, errors.New("role not found")
+}
+
 // TokenVerify verifies the token signature
 func (a *Auth) TokenVerify(signature string) error {
 	sign := a.Header + "." + a.Payload
