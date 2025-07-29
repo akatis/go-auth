@@ -173,7 +173,7 @@ func (a *Auth) Middleware(ctx *fiber.Ctx) error {
 	tokenParts := strings.Split(a.AccessToken, ".")
 	if len(tokenParts) != 3 {
 		response.Message = "malformed token"
-		return response.HttpResponse(ctx, fiber.StatusBadRequest)
+		return response.HttpResponse(ctx, fiber.StatusUnauthorized)
 	}
 
 	a.Header, a.Payload = tokenParts[0], tokenParts[1]
